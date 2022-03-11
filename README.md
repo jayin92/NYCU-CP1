@@ -1,1 +1,1 @@
-# NYCU-competitive-programming-1
+# NYCU Competitive Programming 
