@@ -72,12 +72,68 @@ public:
 const ll MOD = 1000000007;
 const ll INF = 0x3f3f3f3f3f3f3f3f;
 const int iNF = 0x3f3f3f3f;
-const ll MAXN = 100005;
+const ll MAXN = 200005;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
+ll n, q;
+class BIT{
+private:
+    vector<ll> bit;
+public:
+    BIT(): bit(vector<ll>(MAXN, 0)) {}
+    ll lowbit(ll x){
+        return x & (-x);
+    }
+
+    ll query(ll idx){
+        if(idx == 0) return 0;
+        ll ans = 0;
+        for(; idx>0; idx-=lowbit(idx)){
+            ans += bit[idx];
+        }
+
+        return ans;
+    }
+
+    void modify(ll idx, int val){
+        for(; idx <= n; idx += lowbit(idx)){
+            bit[idx] += val;
+        }
+    }
+};
+
+
 void solve(){
-    
+    vector<BIT> bit(6);
+    vector<ll> v(6);
+    cin >> n >> q;
+    vector<int> pos(n+1);
+    for(auto &i: v) cin >> i;
+    string s;
+    cin >> s;
+    for(int i=0;i<n;i++){
+        bit[s[i]-'1'].modify(i+1, 1);
+        pos[i+1] = s[i]-'1';
+    }
+    ll a, b, c;
+    while(q--){
+        cin >> a >> b >> c;
+        if(a == 1){
+            bit[pos[b]].modify(b, -1);
+            bit[c-1].modify(b, 1);
+            pos[b] = c-1;
+        } else if(a == 2){
+            v[b-1] = c;
+        } else {
+            ll ans = 0;
+            for(int i=0;i<6;i++){
+                ans += (bit[i].query(c) - bit[i].query(b-1)) * v[i];
+            }
+            cout << ans << endl;
+        }
+    }
+
 }
 
 /********** Good Luck :) **********/
@@ -85,7 +141,7 @@ int main () {
     TIME(main);
     IOS();
     int t = 1;
-    cin >> t;
+    // cin >> t;
     while(t--){
         solve();
     }
