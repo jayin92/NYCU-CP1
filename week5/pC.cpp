@@ -72,95 +72,116 @@ public:
 const ll MOD = 1000000007;
 const ll INF = 0x3f3f3f3f3f3f3f3f;
 const int iNF = 0x3f3f3f3f;
-const ll MAXN = 100005;
+const ll MAXN = 250005;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
-vector<vector<pll>> adj(MAXN);
-vector<ll> spider_dis(MAXN, iNF);
-vector<bool> spider(MAXN, false);
-vector<int> spi_idx;
+vector<int> dsu(MAXN);
+vector<int> sz(MAXN);
+vector<bool> vis(MAXN, false);
+vector<vector<int>> adj(MAXN);
 
-int dijkstra(int src, int end){
-    vector<ll> dis(MAXN, iNF);
-    priority_queue<pll, vector<pll>, greater<pll>> pq;
-    if(spider[src]) return iNF;
-    pq.push({0, src});
-    dis[src] = 0;
-    while(!pq.empty()){
-        auto cur = pq.top();
-        pq.pop();
-        int u = cur.Y;
-        for(auto tmp: adj[u]){
-            int w = tmp.Y;
-            int v = tmp.X;
-            if(spider[v]) continue;
-            if(dis[u] + w < dis[v]){
-                dis[v] = dis[u] + w;
-                pq.push({dis[v], v});
-            }
-        }
+int n, m;
+
+int find(int a){
+    if(dsu[a] == a){
+        return a;
     }
+    return dsu[a] = find(dsu[a]);
+}
 
-    return dis[end];
+void merge(int a, int b){
+    int fa = find(a);
+    int fb = find(b);
+    if(fa == fb) return;
+    else{
+        if(sz[fa] > sz[fb]) swap(fa, fb);
+        dsu[fa] = fb;
+        sz[fb] += sz[fa];
+    }
+}
 
+inline int idx(int x, int y){
+    return m*x + y;
+}
+
+inline pii cord(int idx){
+    return mp(idx / m, idx % m);
 }
 
 void solve(){
-    int n, m, t;
-    ll l, r;
-    cin >> n >> m >> t;
-    int u, v, w;
-    int src, end;
-    int k;
-    for(int i=0;i<m;i++){
-        cin >> u >> v >> w;
-        adj[u].eb(v, w);
-        adj[v].eb(u, w);
+    cin >> m >> n;
+    vector<vector<int>> a(n, vector<int>(m));
+    set<int> pars;
+    int ans = 0;
+    for(int i=0;i<n;i++){
+        for(int j=0;j<m;j++){
+            cin >> a[i][j];
+            dsu[idx(i, j)] = idx(i, j);
+            sz[idx(i, j)] = 1;            
+        }
     }
-    cin >> src >> end;
-    cin >> k;
-    int ttt;
-    priority_queue<pll, vector<pll>, greater<pll>> pq;
-    for(int i=0;i<k;i++){
-        cin >> ttt;
-        spi_idx.push_back(ttt);
-        pq.push({0, ttt});
-        spider_dis[ttt] = 0;
-    }
-    while(!pq.empty()){
-        auto tmp = pq.top();
-        pq.pop();
-        u = tmp.second;
-        for(auto i: adj[u]){
-            v = i.X;
-            w = i.Y;
-            if(spider_dis[u] + w < spider_dis[v]){
-                spider_dis[v] = spider_dis[u] + w;
-                pq.push({spider_dis[v], v});
+    
+    for(int i=1;i<n;i++){
+        for(int j=0;j<m;j++){
+            if(a[i][j] == a[i-1][j]){
+                merge(idx(i, j), idx(i-1, j));
             }
         }
     }
-    l = 0;
-    r = iNF;
-    ll mid;
-    while(r - l > 1){
-        debug(l, r);
-        mid = (r + l) >> 1;
-        fill(ALL(spider), false);
+
+    for(int j=1;j<m;j++){
         for(int i=0;i<n;i++){
-            spider[i] = (spider_dis[i] < mid);
+            if(a[i][j-1] == a[i][j]){
+                merge(idx(i, j-1), idx(i, j));
+            }
         }
-        int tt = dijkstra(src, end);
-        debug(tt, mid);
-        if(tt <= t){
-            l = mid;
-        } else {
-            r = mid;
-        }
-        debug(l, r);
     }
-    cout << l << endl;
+    for(int i=1;i<n;i++){
+        for(int j=0;j<m;j++){
+            int fa = find(idx(i, j));
+            int fb = find(idx(i-1, j));
+            pars.insert(fa);
+            pars.insert(fb);
+            if(fa != fb){
+                adj[fa].push_back(fb);
+                adj[fb].push_back(fa);
+            }
+        }
+    }
+
+    for(int j=1;j<m;j++){
+        for(int i=0;i<n;i++){
+            int fa = find(idx(i, j));
+            int fb = find(idx(i, j-1));
+            pars.insert(fa);
+            pars.insert(fb);
+            if(fa != fb){
+                adj[fa].push_back(fb);
+                adj[fb].push_back(fa);
+            }
+        }
+    }
+    for(auto par: pars){
+        bool flag = true;
+        auto cop = cord(par);
+        debug(par, adj[par]);
+        for(auto i: adj[par]){
+            auto co = cord(i);
+            debug(co, cop);
+            if(a[co.X][co.Y] <= a[cop.X][cop.Y]){
+                flag = false;
+                break;
+            }
+        }
+        if(flag){
+            debug(par);
+            ans += sz[par];
+        }
+    }
+
+    cout << ans << endl;
+    
 }
 
 /********** Good Luck :) **********/

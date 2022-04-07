@@ -72,95 +72,77 @@ public:
 const ll MOD = 1000000007;
 const ll INF = 0x3f3f3f3f3f3f3f3f;
 const int iNF = 0x3f3f3f3f;
-const ll MAXN = 100005;
+const ll MAXN = 1005;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
-vector<vector<pll>> adj(MAXN);
-vector<ll> spider_dis(MAXN, iNF);
-vector<bool> spider(MAXN, false);
-vector<int> spi_idx;
+vector<vector<int>> a(MAXN, vector<int>(MAXN));
+vector<vector<int>> dis(MAXN, vector<int>(MAXN, iNF));
+int r, c;
+pii dir[4] = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
 
-int dijkstra(int src, int end){
-    vector<ll> dis(MAXN, iNF);
-    priority_queue<pll, vector<pll>, greater<pll>> pq;
-    if(spider[src]) return iNF;
-    pq.push({0, src});
-    dis[src] = 0;
-    while(!pq.empty()){
-        auto cur = pq.top();
-        pq.pop();
-        int u = cur.Y;
-        for(auto tmp: adj[u]){
-            int w = tmp.Y;
-            int v = tmp.X;
-            if(spider[v]) continue;
-            if(dis[u] + w < dis[v]){
-                dis[v] = dis[u] + w;
-                pq.push({dis[v], v});
-            }
-        }
+class Node{
+public:
+    int x;
+    int y;
+    int cost;
+    Node(int _x, int _y, int _cost): x(_x), y(_y), cost(_cost) {}
+    bool operator>(const Node& rhs) const {
+        return this -> cost > rhs.cost;
+    }
+};
+
+inline bool check(int x, int y){
+    if(x < 0 || x >= r || y < 0 || y >= c) return false;
+    return true;
+}
+
+
+
+void dijkstra(){
+    priority_queue<Node, vector<Node>, greater<Node>> pq;
+    for(int i=0;i<r;i++){
+        dis[i][0] = a[i][0];
+        pq.push(Node(i, 0, a[i][0]));
     }
 
-    return dis[end];
+    while(!pq.empty()){
+        int x = pq.top().x;
+        int y = pq.top().y;
+        int cost = pq.top().cost;
 
+        pq.pop();
+
+        if(cost > dis[x][y]) continue;
+
+        for(int i=0;i<4;i++){
+            int xx = x + dir[i].X;
+            int yy = y + dir[i].Y;
+
+            if(check(xx, yy)){
+                if(max(a[xx][yy], cost) < dis[xx][yy]){
+                    dis[xx][yy] = max(a[xx][yy], cost);
+                    pq.push(Node(xx, yy, dis[xx][yy]));
+                }
+            }
+
+        }
+    }
 }
 
 void solve(){
-    int n, m, t;
-    ll l, r;
-    cin >> n >> m >> t;
-    int u, v, w;
-    int src, end;
-    int k;
-    for(int i=0;i<m;i++){
-        cin >> u >> v >> w;
-        adj[u].eb(v, w);
-        adj[v].eb(u, w);
-    }
-    cin >> src >> end;
-    cin >> k;
-    int ttt;
-    priority_queue<pll, vector<pll>, greater<pll>> pq;
-    for(int i=0;i<k;i++){
-        cin >> ttt;
-        spi_idx.push_back(ttt);
-        pq.push({0, ttt});
-        spider_dis[ttt] = 0;
-    }
-    while(!pq.empty()){
-        auto tmp = pq.top();
-        pq.pop();
-        u = tmp.second;
-        for(auto i: adj[u]){
-            v = i.X;
-            w = i.Y;
-            if(spider_dis[u] + w < spider_dis[v]){
-                spider_dis[v] = spider_dis[u] + w;
-                pq.push({spider_dis[v], v});
-            }
+    cin >> r >> c;
+    REP(i, r){
+        REP(j, c){
+            cin >> a[i][j];
         }
     }
-    l = 0;
-    r = iNF;
-    ll mid;
-    while(r - l > 1){
-        debug(l, r);
-        mid = (r + l) >> 1;
-        fill(ALL(spider), false);
-        for(int i=0;i<n;i++){
-            spider[i] = (spider_dis[i] < mid);
-        }
-        int tt = dijkstra(src, end);
-        debug(tt, mid);
-        if(tt <= t){
-            l = mid;
-        } else {
-            r = mid;
-        }
-        debug(l, r);
+    dijkstra();
+    int ans = iNF;
+    for(int i=0;i<r;i++){
+        ans = min(ans, dis[i][c-1]);
     }
-    cout << l << endl;
+    cout << ans << endl;
 }
 
 /********** Good Luck :) **********/

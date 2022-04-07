@@ -76,8 +76,70 @@ const ll MAXN = 100005;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
+int b, n, e;
+int sb, sn, se;
+int m;
+vector<pair<ll, string>> comb;
+
+bool check(string s, int bb, int nn, int ee){
+    for(auto i: s){
+        if(i == 'b'){
+            bb --;
+        } else if(i == 'n'){
+            nn --;
+        } else {
+            ee --;
+        }
+    }
+    return (bb >= 0 and nn >= 0 and ee >= 0);
+}
+
 void solve(){
-    
+    cin >> b >> n >> e;
+    cin >> sb >> sn >> se;
+    m = (b + n + e) / 2;
+    vector<ll> c(m);
+    for(int i=0;i<m;i++) cin >> c[i];
+    comb.eb(sb+sb, "bb");
+    comb.eb(sn+sn, "nn");
+    comb.eb(se+se, "ee");
+    comb.eb(sb+sn, "bn");
+    comb.eb(sb+se, "be");
+    comb.eb(sn+se, "ne");
+    sort(ALL(comb));
+    sort(ALL(c));
+    ll l = 0;
+    ll r = INF;
+    debug(comb, l, r);
+    int x, y, z;
+
+    while(r - l > 1){
+        debug(l, r);
+        x = b, y = n, z = e;
+        ll mid = (l + r) >> 1;
+        for(auto i: c){
+            for(auto j: comb){
+                if(i * j.X >= mid and check(j.Y, x, y, z)){
+                    for(auto k: j.Y){
+                        if(k == 'b'){
+                            x --;
+                        } else if(k == 'n'){
+                            y --;
+                        } else {
+                            z --;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        if(x != 0 or y != 0 or z != 0){
+            r = mid;
+        } else {
+            l = mid;
+        }
+    }
+    cout << l << endl;
 }
 
 /********** Good Luck :) **********/
@@ -85,7 +147,7 @@ int main () {
     TIME(main);
     IOS();
     int t = 1;
-    cin >> t;
+    // cin >> t;
     while(t--){
         solve();
     }

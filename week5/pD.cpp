@@ -72,95 +72,54 @@ public:
 const ll MOD = 1000000007;
 const ll INF = 0x3f3f3f3f3f3f3f3f;
 const int iNF = 0x3f3f3f3f;
-const ll MAXN = 100005;
+const ll MAXN = 1005;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
-vector<vector<pll>> adj(MAXN);
-vector<ll> spider_dis(MAXN, iNF);
-vector<bool> spider(MAXN, false);
-vector<int> spi_idx;
+vector<vector<int>> adj_force(MAXN);
+vector<vector<int>> adj(MAXN);
+set<int> ans;
 
-int dijkstra(int src, int end){
-    vector<ll> dis(MAXN, iNF);
-    priority_queue<pll, vector<pll>, greater<pll>> pq;
-    if(spider[src]) return iNF;
-    pq.push({0, src});
-    dis[src] = 0;
-    while(!pq.empty()){
-        auto cur = pq.top();
-        pq.pop();
-        int u = cur.Y;
-        for(auto tmp: adj[u]){
-            int w = tmp.Y;
-            int v = tmp.X;
-            if(spider[v]) continue;
-            if(dis[u] + w < dis[v]){
-                dis[v] = dis[u] + w;
-                pq.push({dis[v], v});
-            }
+void dfs(int cur, int forced, int cnt){
+    if(cnt >= 905) return;
+    bool move = false;
+    if(forced){
+        if(adj_force[cur].size() != 0){
+            dfs(adj_force[cur][0], true, cnt+1);
+            move = true;
+        }
+    } else {
+        if(adj_force[cur].size() != 0){
+            dfs(adj_force[cur][0], false, cnt + 1);
+            move = true;
+        } else {
+            ans.insert(cur);
+        }
+        for(auto i: adj[cur]){
+            dfs(i, true, cnt + 1);
+            move = true;
         }
     }
-
-    return dis[end];
-
+    if(!move){
+        ans.insert(cur);
+    }
 }
 
 void solve(){
-    int n, m, t;
-    ll l, r;
-    cin >> n >> m >> t;
-    int u, v, w;
-    int src, end;
-    int k;
+    int n, m;
+    cin >> n >> m;
+    int a, b;
     for(int i=0;i<m;i++){
-        cin >> u >> v >> w;
-        adj[u].eb(v, w);
-        adj[v].eb(u, w);
-    }
-    cin >> src >> end;
-    cin >> k;
-    int ttt;
-    priority_queue<pll, vector<pll>, greater<pll>> pq;
-    for(int i=0;i<k;i++){
-        cin >> ttt;
-        spi_idx.push_back(ttt);
-        pq.push({0, ttt});
-        spider_dis[ttt] = 0;
-    }
-    while(!pq.empty()){
-        auto tmp = pq.top();
-        pq.pop();
-        u = tmp.second;
-        for(auto i: adj[u]){
-            v = i.X;
-            w = i.Y;
-            if(spider_dis[u] + w < spider_dis[v]){
-                spider_dis[v] = spider_dis[u] + w;
-                pq.push({spider_dis[v], v});
-            }
-        }
-    }
-    l = 0;
-    r = iNF;
-    ll mid;
-    while(r - l > 1){
-        debug(l, r);
-        mid = (r + l) >> 1;
-        fill(ALL(spider), false);
-        for(int i=0;i<n;i++){
-            spider[i] = (spider_dis[i] < mid);
-        }
-        int tt = dijkstra(src, end);
-        debug(tt, mid);
-        if(tt <= t){
-            l = mid;
+        cin >> a >> b;
+        if(a < 0){
+            adj_force[-a].eb(b);
         } else {
-            r = mid;
+            adj[a].eb(b);
         }
-        debug(l, r);
     }
-    cout << l << endl;
+    dfs(1, false, 0);
+    debug(ans);
+    cout << ans.size() << endl;
 }
 
 /********** Good Luck :) **********/

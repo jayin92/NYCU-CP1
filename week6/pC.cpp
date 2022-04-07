@@ -72,12 +72,38 @@ public:
 const ll MOD = 1000000007;
 const ll INF = 0x3f3f3f3f3f3f3f3f;
 const int iNF = 0x3f3f3f3f;
-const ll MAXN = 100005;
+const ll MAXN = 1000005;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
+ll arr[MAXN];
+ll n, m, a, c, x;
+
 void solve(){
-    
+    cin >> n >> m >> a >> c >> x;
+    arr[0] = x;
+    for(int i=1;i<=n;i++){
+        arr[i] = (arr[i-1] * a + c) % m;
+    }
+    ll ans = 0;
+    ll l, r, mid;
+   
+    for(int i=1;i<=n;i++){
+        l = 1;
+        r = n;
+        while(r >= l){
+            mid = l + (r-l) / 2;
+            if(arr[mid] == arr[i]){
+                ans ++;
+                break;
+            } else if(arr[mid] < arr[i]){
+                l = mid + 1;
+            } else {
+                r = mid - 1;
+            }
+        }
+    }
+    cout << ans << endl;
 }
 
 /********** Good Luck :) **********/
@@ -85,7 +111,7 @@ int main () {
     TIME(main);
     IOS();
     int t = 1;
-    cin >> t;
+    // cin >> t;
     while(t--){
         solve();
     }

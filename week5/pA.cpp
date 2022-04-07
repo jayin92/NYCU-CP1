@@ -72,95 +72,45 @@ public:
 const ll MOD = 1000000007;
 const ll INF = 0x3f3f3f3f3f3f3f3f;
 const int iNF = 0x3f3f3f3f;
-const ll MAXN = 100005;
+const ll MAXN = 200005;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
-vector<vector<pll>> adj(MAXN);
-vector<ll> spider_dis(MAXN, iNF);
-vector<bool> spider(MAXN, false);
-vector<int> spi_idx;
+vector<int> dsu(MAXN);
 
-int dijkstra(int src, int end){
-    vector<ll> dis(MAXN, iNF);
-    priority_queue<pll, vector<pll>, greater<pll>> pq;
-    if(spider[src]) return iNF;
-    pq.push({0, src});
-    dis[src] = 0;
-    while(!pq.empty()){
-        auto cur = pq.top();
-        pq.pop();
-        int u = cur.Y;
-        for(auto tmp: adj[u]){
-            int w = tmp.Y;
-            int v = tmp.X;
-            if(spider[v]) continue;
-            if(dis[u] + w < dis[v]){
-                dis[v] = dis[u] + w;
-                pq.push({dis[v], v});
-            }
-        }
+int find(int a){
+    if(dsu[a] == a){
+        return a;
     }
+    return dsu[a] = find(dsu[a]);
+}
 
-    return dis[end];
-
+void merge(int a, int b){
+    int fa = find(a);
+    int fb = find(b);
+    if(fa == fb) return;
+    else{
+        dsu[max(fa, fb)] = min(fa, fb);
+    }
 }
 
 void solve(){
-    int n, m, t;
-    ll l, r;
-    cin >> n >> m >> t;
-    int u, v, w;
-    int src, end;
-    int k;
-    for(int i=0;i<m;i++){
-        cin >> u >> v >> w;
-        adj[u].eb(v, w);
-        adj[v].eb(u, w);
+    int n, m;
+    cin >> n >> m;
+    for(int i=0;i<=n;i++) dsu[i] = i;
+    int a, b;
+    while(m--){
+        cin >> a >> b;
+        merge(a, b);
     }
-    cin >> src >> end;
-    cin >> k;
-    int ttt;
-    priority_queue<pll, vector<pll>, greater<pll>> pq;
-    for(int i=0;i<k;i++){
-        cin >> ttt;
-        spi_idx.push_back(ttt);
-        pq.push({0, ttt});
-        spider_dis[ttt] = 0;
-    }
-    while(!pq.empty()){
-        auto tmp = pq.top();
-        pq.pop();
-        u = tmp.second;
-        for(auto i: adj[u]){
-            v = i.X;
-            w = i.Y;
-            if(spider_dis[u] + w < spider_dis[v]){
-                spider_dis[v] = spider_dis[u] + w;
-                pq.push({spider_dis[v], v});
-            }
+    bool flag = true;
+    for(int i=1;i<=n;i++){
+        if(find(i) != 1){
+            flag = false;
+            cout << i << endl;
         }
     }
-    l = 0;
-    r = iNF;
-    ll mid;
-    while(r - l > 1){
-        debug(l, r);
-        mid = (r + l) >> 1;
-        fill(ALL(spider), false);
-        for(int i=0;i<n;i++){
-            spider[i] = (spider_dis[i] < mid);
-        }
-        int tt = dijkstra(src, end);
-        debug(tt, mid);
-        if(tt <= t){
-            l = mid;
-        } else {
-            r = mid;
-        }
-        debug(l, r);
-    }
-    cout << l << endl;
+    if(flag) cout << "Connected" << endl;
 }
 
 /********** Good Luck :) **********/
