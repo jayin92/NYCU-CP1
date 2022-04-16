@@ -76,8 +76,97 @@ const ll MAXN = 100005;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
+bool isVowel(char c){
+    return c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U';
+}
+
+bool check(vector<bool> s){
+    int n = s.size();
+    for(int i=0;i<n-2;i++){
+        if((s[i] == s[i+1]) and (s[i+1] == s[i+2])){
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void solve(){
-    
+    string s;
+    cin >> s;
+    bool hasL = false;
+    vector<int> idx;
+    int sz = s.size();
+    vector<bool> a(sz, false);
+    for(int i=0;i<sz;i++){
+        if(s[i] == 'L'){
+            hasL = true;
+        }
+        if(s[i] == '_'){
+            idx.push_back(i);
+        }
+        a[i] = isVowel(s[i]);
+    }
+    int n = idx.size();
+    ll ans = 0;
+    debug(a);
+    if(hasL){
+        int sum = 1 << n;
+        for(int i=0;i<sum;i++){
+            int tmp = i;
+            int cc = 0;
+            for(auto j: idx){
+                a[j] = tmp & 1;
+                tmp = tmp >> 1;
+                cc += a[j];
+            }
+            if(check(a)){
+                debug(a);
+                ll x = 1;
+                REP(j, cc) x *= 5LL;
+                REP(j, n-cc) x *= 21LL;
+                ans += x;
+            }
+        }
+    } else {
+        int sum = 1 << (n-1);
+        debug(sum);
+        int cnt = 0;
+        for(auto j: idx){
+            debug(j);
+            a[j] = 0;
+            for(int i=0;i<sum;i++){
+                int tmp = i;
+                int cc = 0;
+                for(auto k: idx){
+                    if(k != j){
+                        a[k] = tmp & 1;
+                        tmp = tmp >> 1;
+                        cc += a[k];
+                    }
+                }
+                if(check(a)){
+                    ll x = 1;
+                    debug(cnt, j);
+                    ll con = 20;
+                    for(auto k: idx){
+                        if(k == j){
+                            con = 21;
+                            continue;
+                        }
+                        if(a[k] == 0){
+                            x *= con;
+                        } else {
+                            x *= 5LL;
+                        }
+                    }
+                    ans += x;
+                }
+            }
+            cnt ++;
+        }
+    }
+    cout << ans << endl;
 }
 
 /********** Good Luck :) **********/
@@ -85,7 +174,7 @@ int main () {
     TIME(main);
     IOS();
     int t = 1;
-    cin >> t;
+    // cin >> t;
     while(t--){
         solve();
     }

@@ -76,36 +76,27 @@ const ll MAXN = 100005;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
-ll power(ll x, ll y, ll p) 
-{ 
-	ll res = 1; // Initialize result 
-
-	// Update x if it is more than or 
-	// equal to p 
-	x = x % p; 
-
-	while (y > 0) { 
-		// If y is odd, multiply x with the result 
-		if (y & 1) 
-			res = (res * x) % p; 
-
-		// y must be even now 
-		y = y >> 1; // y = y/2 
-		x = (x * x) % p; 
-	} 
-	return res; 
-} 
-
 void solve(){
-    ll a, b;
-    cin >> a >> b;
-    ll ans = 0;
-    if((a & 1) == 1){
-        ans = 0;
-    } else {
-        ans = power(a/2, b, a);
+    int n;
+    cin >> n;
+    vector<int> x(n);
+    vector<int> y(n);
+    for(int i=0;i<n;i++){
+        cin >> x[i] >> y[i];
     }
-    cout << ans << endl;
+    sort(ALL(x));
+    sort(ALL(y));
+    ll ans = 0;
+    int ax, ay;
+    if(n % 2 == 1){
+        ax = x[n/2+1];
+        ay = y[n/2+1];
+        for(int i)
+    } else {
+
+    }
+    
+
 }
 
 /********** Good Luck :) **********/
@@ -113,7 +104,7 @@ int main () {
     TIME(main);
     IOS();
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while(t--){
         solve();
     }

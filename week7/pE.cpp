@@ -76,8 +76,25 @@ const ll MAXN = 100005;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
+vector<ll> fib = {0, 1, 1};
+
 void solve(){
-    
+    ll n, k;
+    cin >> n >> k;
+    while(n > 2){
+        if(k > fib[n-2]){
+            k -= fib[n-2];
+            n -= 1LL;
+        } else {
+            n -= 2LL;
+        }
+    }
+    if(n == 1){
+        cout << "N";
+    } else {
+        cout << "A";
+    }
+    cout << endl;
 }
 
 /********** Good Luck :) **********/
@@ -85,7 +102,11 @@ int main () {
     TIME(main);
     IOS();
     int t = 1;
-    cin >> t;
+    // cin >> t;
+    fib.resize(1e5+5);
+    for(int i=3;i<1e5+5;i++){
+        fib[i] = fib[i-1] + fib[i-2];
+    }
     while(t--){
         solve();
     }

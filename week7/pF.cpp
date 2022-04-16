@@ -76,8 +76,53 @@ const ll MAXN = 100005;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
+inline ll lowbit(ll x){
+    return x & (-x);
+}
+
+int n;
+vector<int> a;
+class BIT{
+private:
+    vector<ll> sum;
+public:
+    BIT(): sum(vector<ll>(MAXN, 0)) {}
+    void update(int idx, int val){
+        for(int i=idx;i<=n;i+=lowbit(i)){
+            sum[i] += val;
+        }
+    }
+    ll query(int idx){
+        ll res = 0;
+        for(int i=idx;i>0;i-=lowbit(i)){
+            res += sum[i];
+        }
+
+        return res;
+    }
+};
+
 void solve(){
-    
+    cin >> n;
+    a.resize(n);
+    for(auto &i: a) cin >> i;
+    BIT bit1, bit2;
+    vector<ll> ans1(MAXN, 0);
+    vector<ll> ans2(MAXN, 0);
+    for(int i=n-1;i>=0;i--){
+        ans1[i] = bit1.query(a[i]-1);
+        bit1.update(a[i], 1);
+    }
+    for(int i=0;i<n;i++){
+        ans2[i] = i - bit2.query(a[i]);
+        bit2.update(a[i], 1);
+    }
+    ll ans = 0;
+    for(int i=0;i<n;i++){
+        ans += ans1[i] * ans2[i];
+    }
+    cout << ans << endl;
+
 }
 
 /********** Good Luck :) **********/
@@ -85,7 +130,7 @@ int main () {
     TIME(main);
     IOS();
     int t = 1;
-    cin >> t;
+    // cin >> t;
     while(t--){
         solve();
     }
