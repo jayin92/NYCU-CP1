@@ -76,8 +76,79 @@ const ll MAXN = 100005;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
-void solve(){
+typedef complex<double> cd;
+const double PI = acos(-1);
+
+void fft(vector<cd> &a, bool invert){
+    ll n = a.size();
+    if(n == 1) return;
+    vector<cd> a0(n/2), a1(n/2);
+    for(ll i=0;i*2<n;i++){
+        a0[i] = a[2*i];
+        a1[i] = a[2*i+1];
+    }
+
+    fft(a0, invert);
+    fft(a1, invert);
+
+    double ang = 2 * PI / n * (invert ? -1 : 1);
+    cd w(1), wn(cos(ang), sin(ang));
+
+    for(ll i=0;i*2<n;i++){
+        a[i] = a0[i] + w * a1[i];
+        a[i+n/2] = a0[i] - w * a1[i];
+        if(invert){
+            a[i] /= 2;
+            a[i+n/2] /= 2;
+        }
+        w *= wn;
+    }
+}
+
+vector<ll> multiply(vector<ll>& a, vector<ll>& b){
+    vector<cd> fa(a.begin(), a.end()), fb(b.begin(), b.end());
+    ll n = 1;
+
+    while(n < (ll)a.size() + (ll)b.size()){
+        n <<= 1;
+        debug(n);
+    }
+    fa.resize(n);
+    fb.resize(n);
+
+    fft(fa, false);
+    fft(fb, false);
     
+    for(ll i=0;i<n;i++){
+        fa[i] *= fb[i];
+    }
+
+    fft(fa, true);
+    vector<ll> res(n);
+    for(ll i=0;i<n;i++){
+        res[i] = round(fa[i].real());
+    }
+
+    return res;
+}
+
+void solve(){
+    string s;
+    cin >> s;
+    ll n = s.size();
+    vector<ll> a(n, 0), b(n, 0);
+    for(ll i=0;i<n;i++){
+        if(s[i] == 'A'){
+            a[i] += 1;
+        } else {
+            b[n-1-i] += 1;
+        }
+    }
+    auto res = multiply(a, b);
+    debug(res);
+    for(int i=0;i<n-1;i++){
+        cout << res[i+n] << endl;
+    }
 }
 
 /********** Good Luck :) **********/
@@ -85,7 +156,6 @@ int main () {
     TIME(main);
     IOS();
     int t = 1;
-    cin >> t;
     while(t--){
         solve();
     }

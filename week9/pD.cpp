@@ -76,8 +76,38 @@ const ll MAXN = 100005;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
+
+bool cmp(pll &a, pll &b){
+    if(a.Y != b.Y) return a.Y < b.Y;
+    else return a.X > b.X;
+}
+
 void solve(){
-    
+    int n, k;
+    cin >> n >> k;
+    vector<pll> a(n);
+    priority_queue<pll> pq; 
+    for(auto &i: a) cin >> i.X >> i.Y;
+    sort(ALL(a), cmp);
+    int ans = 0;
+    multiset<int> end_time;
+    for(auto i: a){
+        auto it = end_time.upper_bound(i.X);
+        if(it != end_time.begin()){
+            it --;
+            if(*it <= i.X){
+                end_time.erase(it);
+                end_time.insert(i.Y);
+                ans ++;
+                continue;
+            }
+        }
+        if((int)end_time.size() < k){
+            end_time.insert(i.Y);
+            ans ++;
+        }
+    }
+    cout << ans << endl;
 }
 
 /********** Good Luck :) **********/
@@ -85,7 +115,6 @@ int main () {
     TIME(main);
     IOS();
     int t = 1;
-    cin >> t;
     while(t--){
         solve();
     }

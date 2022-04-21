@@ -91,7 +91,8 @@ void solve(){
     if(n % 2 == 1){
         ax = x[n/2+1];
         ay = y[n/2+1];
-        for(int i)
+        for(int i=0;i<n;i++){
+        }
     } else {
 
     }

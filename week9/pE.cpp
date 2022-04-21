@@ -76,8 +76,49 @@ const ll MAXN = 100005;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
+vector<int> a;
+ll n, k;
+
+bool check(ll x){
+    ll maxi_size = k * x;
+    queue<int> q;
+    for(int i=0;i<n;i++){
+        debug(a[i]);
+        while(!q.empty()){
+            if(q.front() <= a[i]){
+                q.pop();
+            } else {
+                break;
+            }
+        }
+        q.push(a[i]+1000);
+        debug(q.size(), maxi_size);
+        if((int)q.size() > maxi_size){
+            return false;
+        }
+    }
+    return true;
+}
+
 void solve(){
-    
+    cin >> n >> k;
+    int tmp;
+    for(int i=0;i<n;i++){
+        cin >> tmp;
+        a.pb(tmp);
+    }
+    ll l = 0;
+    ll r = n;
+    while(l + 1 < r){
+        ll mid = (l+r) >> 1;
+        debug(l, r, mid);
+        if(check(mid)){
+            r = mid;
+        } else {
+            l = mid;
+        }
+    }
+    cout << r << endl;
 }
 
 /********** Good Luck :) **********/
@@ -85,7 +126,6 @@ int main () {
     TIME(main);
     IOS();
     int t = 1;
-    cin >> t;
     while(t--){
         solve();
     }
