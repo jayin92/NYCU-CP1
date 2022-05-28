@@ -76,8 +76,74 @@ const ll MAXN = 100005;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
+vector<vector<int>> adj(MAXN);
+vector<bool> vis(MAXN, false);
+ll mxd;
+ll fp;
+ll all_max = 0;
+
+void dfs(int fa, int cur, ll dep){
+    vis[cur] = true;
+    if(dep > mxd){
+        mxd = dep;
+        fp = cur;
+    }
+    for(auto i: adj[cur]){
+        if(i != fa){
+            dfs(cur, i, dep+1);
+        }
+    }
+}
+
+ll radius(int i){
+    mxd = -1;
+    dfs(-1, i, 0);
+    mxd = -1;
+    dfs(-1, fp, 0);
+    all_max = max(all_max, mxd);
+    return (mxd+1)/2;
+}
+
 void solve(){
-    
+    int c, l;
+    cin >> c >> l;
+    int a, b;
+    for(int i=0;i<l;i++){
+        cin >> a >> b;
+        adj[a].pb(b);
+        adj[b].pb(a);
+    }
+    vector<ll> r;
+    for(int i=0;i<c;i++){
+        if(!vis[i]){
+            r.push_back(radius(i));
+        }
+    }
+    int sz = r.size();
+    sort(ALL(r));
+    reverse(ALL(r));
+    debug(mxd);
+    ll ans = all_max;
+    if(c == 1){
+        cout << 0 << endl;
+        return;
+    } else if(c == 2){
+        cout << 1 << endl;
+        return;
+    } else if(c == 3){
+        cout << 2 << endl;
+        return;
+    } else if(sz == 1){
+        cout << all_max << endl;
+        return;
+    }
+    if(r[0] == r[1] && r[1] == r[2]){
+        ans = max(ans, r[0]+r[1]+2);
+    } else {
+        ans = max(ans, r[0]+r[1]+1);
+    }
+
+    cout << ans << endl;
 }
 
 /********** Good Luck :) **********/
@@ -85,7 +151,6 @@ int main () {
     TIME(main);
     IOS();
     int t = 1;
-    cin >> t;
     while(t--){
         solve();
     }
