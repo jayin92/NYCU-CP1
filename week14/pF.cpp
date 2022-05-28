@@ -76,8 +76,105 @@ const ll MAXN = 100005;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
+vector<vector<int>> adj;
+vector<vector<int>> p;
+vector<int> d;
+vector<int> sz;
+
+
+int dfs(int cur, int par, int dep){
+    debug(cur, par, dep);
+    d[cur] = dep;
+    p[cur][0] = par;
+    int res = 1;
+    for(auto i: adj[cur]){
+        if(i != par){
+            res += dfs(i, cur, dep+1);
+        }
+    }
+    return sz[cur] = res;
+}
+
+int lca(int x, int y){
+    if(d[x] > d[y]) swap(x, y);
+    if(d[x] != d[y]){
+        int diff = d[y] - d[x];
+        for(int i=0;i<20;i++){
+            if(diff & 1) y = p[y][i];
+            diff >>= 1;
+        }
+    }
+    if(x == y) return x;
+    for(int i=19;i>=0;i--){
+        if(p[x][i] != p[y][i]){
+            x = p[x][i];
+            y = p[y][i];
+        }
+    }
+
+    return p[x][0];
+}
+
 void solve(){
-    
+    int n;
+    cin >> n;
+    adj.resize(n+1);
+    p.resize(n+1, vector<int>(20, 0));
+    d.resize(n+1);
+    sz.resize(n+1, 0);
+    vector<int> root;
+    for(int i=1, j;i<=n;i++){
+        cin >> j;
+        if(j == 0){
+            root.push_back(i);
+        } else {
+            adj[i].push_back(j);
+            adj[j].push_back(i);
+        }
+    }
+    for(auto i: root){
+        dfs(i, 0, 1);
+    }
+    for(int i=1;i<20;i++){
+        for(int j=1;j<=n;j++){
+            p[j][i] = p[p[j][i-1]][i-1];
+        }
+    }
+    int q, m, tmp;
+    cin >> q;
+    while(q--){
+        cin >> m;
+        list<int> a;
+        for(int i=0;i<m;i++){
+            cin >> tmp;
+            a.push_back(tmp);
+        }
+        while(true){
+            bool flag = true;
+            for(auto i=a.begin();i!=a.end();i++){
+                for(auto j=next(i);j!=a.end();j++){
+                    int lc = lca(*i, *j);
+                    if(lc == *i || lc == *j){
+                        if(lc == *i){
+                            a.erase(j);
+                        } else {
+                            a.erase(i);
+                        }
+                        flag = false;
+                        break;
+                    }
+                }
+                if(!flag) break;
+            }
+            if(flag) break;
+        }
+        ll ans = 0;
+        for(auto i: a){
+            ans += sz[i];
+        }
+        cout << ans << endl;
+    }
+
 }
 
 /********** Good Luck :) **********/
@@ -85,7 +182,6 @@ int main () {
     TIME(main);
     IOS();
     int t = 1;
-    cin >> t;
     while(t--){
         solve();
     }

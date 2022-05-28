@@ -72,12 +72,54 @@ public:
 const ll MOD = 1000000007;
 const ll INF = 0x3f3f3f3f3f3f3f3f;
 const int iNF = 0x3f3f3f3f;
-const ll MAXN = 100005;
+const ll MAXN = 30005;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 void solve(){
-    
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    vector<ll> dp(MAXN, 0);
+    vector<pii> pre(MAXN);
+    for(auto &i: a){
+        cin >> i;
+    }
+    for(int j=0;j<n;j++){
+        dp[a[j]] += 1;
+        pre[a[j]] = {-1, j};
+        for(int i=0;i<MAXN;i++){
+            if(dp[i] > 0 and i + a[j] < MAXN){
+                dp[i+a[j]] += dp[i];
+                pre[i+a[j]] = {i, j};
+            }
+        }
+        for(int i=0;i<30;i++){
+            debug(i, dp[i]);
+        }
+    }
+    int m;
+    cin >> m;
+    int b;
+    while(m--){
+        cin >> b;
+        if(dp[b] == 0){
+            cout << "Impossible" << endl;
+        } else if(dp[b] > 1){
+            cout << "Ambiguous" << endl;
+        } else {
+            vector<int> ans;
+            while(b != -1){
+                ans.push_back(pre[b].second+1);
+                b = pre[b].first;
+            }
+            sort(ALL(ans));
+            for(auto i: ans){
+                cout << i << " ";
+            }
+            cout << endl;
+        }
+    }
 }
 
 /********** Good Luck :) **********/
@@ -85,7 +127,7 @@ int main () {
     TIME(main);
     IOS();
     int t = 1;
-    cin >> t;
+    // cin >> t;
     while(t--){
         solve();
     }

@@ -77,7 +77,45 @@ const ll MAXN = 100005;
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 void solve(){
-    
+    int h, b;
+    cin >> h;
+    vector<int> x(h);
+    for(auto &i: x) cin >> i;
+    cin >> b;
+    vector<int> y(b);
+    for(auto &i: y) cin >> i;
+    debug(x, y);
+    vector<int> dpx(MAXN, iNF);
+    vector<int> dpy(MAXN, iNF);
+    dpx[0] = dpy[0] = 0;
+    for(int i=0;i<h;i++){
+        for(int j=MAXN-1;j>=0;j--){
+            if(j - x[i] >= 0){
+                dpx[j] = min(dpx[j], dpx[j-x[i]] + 1);
+            }
+        }
+    }
+    for(int i=0;i<b;i++){
+        for(int j=MAXN-1;j>=0;j--){
+            if(j - y[i] >= 0){
+                dpy[j] = min(dpy[j], dpy[j-y[i]] + 1);
+            }
+        }
+    }
+    for(int i=0;i<100;i++){
+        debug(i, dpx[i], dpy[i]);
+    }
+    int ans = iNF;
+    for(int i=1;i<MAXN;i++){
+        if(dpx[i] != iNF and dpy[i] != iNF){
+            ans = min(ans, dpx[i] + dpy[i]);
+        }
+    }
+    if(ans == iNF){
+        cout << "impossible" << endl;
+    } else {
+        cout << ans << endl;
+    }
 }
 
 /********** Good Luck :) **********/
@@ -85,7 +123,6 @@ int main () {
     TIME(main);
     IOS();
     int t = 1;
-    cin >> t;
     while(t--){
         solve();
     }
