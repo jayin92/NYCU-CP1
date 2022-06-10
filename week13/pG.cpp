@@ -69,15 +69,42 @@ public:
 #define IOS() ios_base::sync_with_stdio(0);cin.tie(0)
 #endif
 
-const ll MOD = 1000000007;
+const ll MOD = 9901;
 const ll INF = 0x3f3f3f3f3f3f3f3f;
 const int iNF = 0x3f3f3f3f;
-const ll MAXN = 100005;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 void solve(){
-    
+    int n, k;
+    cin >> n >> k;
+    vector<vector<bool>> forbid(n+1, vector<bool>(n+1, false));
+    int a, b;
+    for(int i=0;i<k;i++){
+        cin >> a >> b;
+        forbid[a][b] = forbid[b][a] = true;
+    }
+    vector<int> x;
+    for(int i=2;i<=n;i++) x.push_back(i);
+    int sz = x.size();
+    ll ans = 0;
+    do{
+        if(forbid[1][x[0]] || forbid[1][x[sz-1]]) continue;
+        bool flag = true;
+        for(int i=1;i<sz;i++){
+            if(forbid[x[i]][x[i-1]]){
+                flag = false;
+                break;
+            }
+        }
+        if(flag){
+            ans ++;
+        }
+    } while(next_permutation(ALL(x)));
+    ans = ans / 2LL;
+    while(ans <= 0) ans += MOD;
+    ans %= MOD;
+    cout << ans << endl;
 }
 
 /********** Good Luck :) **********/
@@ -86,7 +113,8 @@ int main () {
     IOS();
     int t = 1;
     cin >> t;
-    while(t--){
+    for(int i=0;i<t;i++){
+        cout << "CASE #" << i + 1 << ": " << endl;
         solve();
     }
 
